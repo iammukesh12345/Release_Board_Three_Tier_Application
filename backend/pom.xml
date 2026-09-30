@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>3.2.5</version>
+    <relativePath/>
+  </parent>
+
+  <groupId>com.devops</groupId>
+  <artifactId>release-board-backend</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+  <name>release-board-backend</name>
+
+  <properties>
+    <java.version>17</java.version>
+    <!-- Override from Jenkins: -Dnexus.url=http://<nexus-host>:8081 -->
+    <nexus.url>http://localhost:8081</nexus.url>
+    <dependency-check.version>9.2.0</dependency-check.version>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.mysql</groupId>
+      <artifactId>mysql-connector-j</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <!-- In-memory DB used only by integration tests -->
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <!-- Fat jar is attached with classifier "exec" so Failsafe can use the thin jar -->
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <configuration>
+          <classifier>exec</classifier>
+        </configuration>
+      </plugin>
+
+      <!-- Stage 3: unit tests  (*Test.java)  -> mvn test -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+      </plugin>
+
+      <!-- Stage 5: integration tests (*IT.java) -> mvn failsafe:integration-test failsafe:verify -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>integration-test</goal>
+              <goal>verify</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- Stage 4: OWASP Dependency-Check -> mvn dependency-check:check -->
+      <plugin>
+        <groupId>org.owasp</groupId>
+        <artifactId>dependency-check-maven</artifactId>
+        <version>${dependency-check.version}</version>
+        <configuration>
+          <failBuildOnCVSS>9</failBuildOnCVSS>
+          <formats>
+            <format>HTML</format>
+            <format>XML</format>
+          </formats>
+          <nvdApiKeyEnvironmentVariable>NVD_API_KEY</nvdApiKeyEnvironmentVariable>
+          <skipTestScope>true</skipTestScope>
+          <suppressionFile>dependency-check-suppressions.xml</suppressionFile>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <!-- Stage 6: mvn deploy pushes to these Nexus repos (server ids must match settings.xml) -->
+  <distributionManagement>
+    <repository>
+      <id>nexus-releases</id>
+      <url>${nexus.url}/repository/maven-releases/</url>
+    </repository>
+    <snapshotRepository>
+      <id>nexus-snapshots</id>
+      <url>${nexus.url}/repository/maven-snapshots/</url>
+    </snapshotRepository>
+  </distributionManagement>
+</project>

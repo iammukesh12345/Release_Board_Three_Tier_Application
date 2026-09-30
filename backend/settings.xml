@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Used by Jenkins:  mvn -s settings.xml ...
+     Required env vars: NEXUS_URL, NEXUS_USERNAME, NEXUS_PASSWORD -->
+<settings xmlns="http://maven.apache.org/SETTINGS/1.2.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.2.0 https://maven.apache.org/xsd/settings-1.2.0.xsd">
+
+  <servers>
+    <server>
+      <id>nexus-releases</id>
+      <username>${env.NEXUS_USERNAME}</username>
+      <password>${env.NEXUS_PASSWORD}</password>
+    </server>
+    <server>
+      <id>nexus-snapshots</id>
+      <username>${env.NEXUS_USERNAME}</username>
+      <password>${env.NEXUS_PASSWORD}</password>
+    </server>
+    <server>
+      <id>nexus-public</id>
+      <username>${env.NEXUS_USERNAME}</username>
+      <password>${env.NEXUS_PASSWORD}</password>
+    </server>
+  </servers>
+
+  <!-- All dependency downloads go through the Nexus group repo -->
+  <mirrors>
+    <mirror>
+      <id>nexus-public</id>
+      <mirrorOf>*</mirrorOf>
+      <url>${env.NEXUS_URL}/repository/maven-public/</url>
+    </mirror>
+  </mirrors>
+
+  <profiles>
+    <profile>
+      <id>nexus</id>
+      <properties>
+        <nexus.url>${env.NEXUS_URL}</nexus.url>
+      </properties>
+    </profile>
+  </profiles>
+  <activeProfiles>
+    <activeProfile>nexus</activeProfile>
+  </activeProfiles>
+</settings>
