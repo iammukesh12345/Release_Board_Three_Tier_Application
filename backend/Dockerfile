@@ -1,8 +1,8 @@
-# Jenkins builds the jar first (stage 2); this image only packages it.
-FROM eclipse-temurin:17-jre-alpine
-RUN addgroup -S app && adduser -S app -G app
+FROM eclipse-temurin:21-jre-jammy
 WORKDIR /app
-COPY target/*-exec.jar app.jar
-USER app
+RUN useradd --system --create-home --uid 10001 appuser
+COPY target/task-manager-api.jar app.jar
+RUN chown -R appuser:appuser /app
+USER 10001
 EXPOSE 8080
-ENTRYPOINT ["java","-XX:MaxRAMPercentage=75","-jar","/app/app.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
