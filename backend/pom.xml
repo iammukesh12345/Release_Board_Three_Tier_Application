@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>3.2.5</version>
+    <version>4.1.1</version>
     <relativePath/>
   </parent>
 
@@ -17,12 +17,27 @@
 
   <properties>
     <java.version>17</java.version>
-    <!-- Override from Jenkins: -Dnexus.url=http://<nexus-host>:8081 -->
     <nexus.url>http://localhost:8081</nexus.url>
-    <dependency-check.version>9.2.0</dependency-check.version>
-  </properties>
+    <dependency-check.version>11.0.0</dependency-check.version>
+    <tomcat.version>11.0.26</tomcat.version>
+</properties>
 
   <dependencies>
+	  <dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-resttestclient</artifactId>
+    <scope>test</scope>
+</dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-webmvc-test</artifactId>
+    <scope>test</scope>
+</dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-restclient</artifactId>
+    <scope>test</scope>
+</dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
